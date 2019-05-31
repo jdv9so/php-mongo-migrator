@@ -6,11 +6,25 @@ use Sokil\Mongo\Migrator\Config;
 use Sokil\Mongo\Migrator\Console\Exception\ConfigurationNotFound;
 use Sokil\Mongo\Migrator\Manager;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Console\Input\InputOption;
 
 abstract class Command extends \Symfony\Component\Console\Command\Command
 {
     private $config;
-    
+
+    public function __construct(string $name = null)
+    {
+        parent::__construct($name);
+
+        $this->addOption(
+            '--config',
+            '-c',
+            InputOption::VALUE_OPTIONAL,
+            'The config file'
+        );
+
+    }
+
     /**
      *
      * @var \Sokil\Mongo\Migrator\Manager
@@ -23,18 +37,23 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      *
      * @return \Sokil\Mongo\Migrator\Config
      */
-    protected function getConfig()
+    protected function getConfig($cfgFile = null)
     {
         if (!$this->config) {
-            $this->config = new Config($this->readConfig());
+            $this->config = new Config($this->readConfig($cfgFile));
         }
         
         return $this->config;
     }
     
-    private function readConfig()
+    private function readConfig($cfgFile = null)
     {
-        $filename = $this->getProjectRoot() . '/' . self::CONFIG_FILENAME;
+
+        $file = self::CONFIG_FILENAME;
+        if (!empty($cfgFile)) {
+            $file = $cfgFile;
+        }
+        $filename = $this->getProjectRoot() . '/' . $file;
 
         $yamlFilename = $filename . '.yaml';
         if (file_exists($yamlFilename)) {
@@ -54,10 +73,10 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      *
      * @return bool
      */
-    public function isProjectInitialised()
+    public function isProjectInitialised($cfgFile = null)
     {
         try {
-            $config = $this->getConfig();
+            $config = $this->getConfig($cfgFile);
             return (bool) $config;
         } catch (ConfigurationNotFound $e) {
             return false;
@@ -68,9 +87,9 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @return bool
      * @deprecated due to misspell in method name
      */
-    public function isProjectInitialisd()
+    public function isProjectInitialisd($cfgFile = null)
     {
-        return $this->isProjectInitialised();
+        return $this->isProjectInitialised($cfgFile);
     }
 
     /**
@@ -87,10 +106,10 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      *
      * @return \Sokil\Mongo\Migrator\Manager
      */
-    public function getManager()
+    public function getManager($cfgFile = null)
     {
         if (!$this->manager) {
-            $this->manager = new Manager($this->getConfig(), $this->getProjectRoot());
+            $this->manager = new Manager($this->getConfig($cfgFile), $this->getProjectRoot());
         }
         
         return $this->manager;

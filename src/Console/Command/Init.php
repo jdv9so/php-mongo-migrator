@@ -27,7 +27,9 @@ class Init extends \Sokil\Mongo\Migrator\Console\Command
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this->isProjectInitialisd()) {
+        $config = $input->getOption('config');
+
+        if ($this->isProjectInitialisd($config)) {
             throw new \Exception('Migration project already initialised');
         }
         
@@ -52,7 +54,7 @@ class Init extends \Sokil\Mongo\Migrator\Console\Command
         $output->writeln('Project config "mongo-migrator.yaml" created at <info>' . $configPath . '</info>');
         
         // create migrations dir
-        $migrationsDirectory = $this->getManager()->getMigrationsDir();
+        $migrationsDirectory = $this->getManager($config)->getMigrationsDir();
         
         if (!file_exists($migrationsDirectory)) {
             if (!mkdir($migrationsDirectory, 0755, true)) {

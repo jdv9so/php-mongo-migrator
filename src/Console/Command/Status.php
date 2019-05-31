@@ -51,8 +51,9 @@ class Status extends \Sokil\Mongo\Migrator\Console\Command
 
         // environment
         $environment = $input->getOption('environment');
+        $config = $input->getOption('config');
         if (!$environment) {
-            $environment = $this->getConfig()->getDefaultEnvironment();
+            $environment = $this->getConfig($config)->getDefaultEnvironment();
         }
         
         $output->writeln('Environment: <comment>' . $environment . '</comment>');
@@ -68,7 +69,7 @@ class Status extends \Sokil\Mongo\Migrator\Console\Command
         $output->writeln(str_repeat('-', 35));
         
         // body
-        $manager = $this->getManager();
+        $manager = $this->getManager($config);
         
         foreach ($manager->getAvailableRevisions($length) as $revision) {
             if ($manager->isRevisionApplied($revision->getId(), $environment)) {

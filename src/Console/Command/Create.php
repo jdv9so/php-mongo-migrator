@@ -40,9 +40,11 @@ class Create extends Command
         if (!preg_match('/^([A-Z][a-z0-9]+)+$/', $className)) {
             throw new \Exception('Name must be in CamelCase notation');
         }
+
+        $config = $input->getOption('config');
         
         $migrationFilename = date('YmdHis') . '_' . $className . '.php';
-        $migrationFileDir = $this->getManager()->getMigrationsDir();
+        $migrationFileDir = $this->getManager($config)->getMigrationsDir();
         $migrationFilePath =  $migrationFileDir . '/' . $migrationFilename;
         
         if (file_exists($migrationFilePath)) {

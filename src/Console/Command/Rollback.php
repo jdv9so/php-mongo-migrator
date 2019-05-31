@@ -37,14 +37,15 @@ class Rollback extends \Sokil\Mongo\Migrator\Console\Command
         
         // environment
         $environment = $input->getOption('environment');
+        $config = $input->getOption('config');
         if (!$environment) {
-            $environment = $this->getConfig()->getDefaultEnvironment();
+            $environment = $this->getConfig($config)->getDefaultEnvironment();
         }
         
         $output->writeln('Environment: <comment>' . $environment . '</comment>');
         
         // execute
-        $this->getManager()
+        $this->getManager($config)
             ->onBeforeRollbackRevision(function (ApplyRevisionEvent $event) use ($output) {
                 $revision = $event->getRevision();
                 $output->writeln('Rollback to revision <info>' . $revision->getId() . '</info> ' . $revision->getName() . ' ...');

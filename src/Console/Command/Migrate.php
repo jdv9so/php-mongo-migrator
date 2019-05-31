@@ -34,17 +34,18 @@ class Migrate extends \Sokil\Mongo\Migrator\Console\Command
     {
         // version
         $revision = $input->getOption('revision');
-        
+        $config = $input->getOption('config');
+
         // environment
         $environment = $input->getOption('environment');
         if (!$environment) {
-            $environment = $this->getConfig()->getDefaultEnvironment();
+            $environment = $this->getConfig($config)->getDefaultEnvironment();
         }
         
         $output->writeln('Environment: <comment>' . $environment . '</comment>');
         
         // execute
-        $this->getManager()
+        $this->getManager($config)
             ->onBeforeMigrateRevision(function (ApplyRevisionEvent $event) use ($output) {
                 $revision = $event->getRevision();
                 $output->writeln('Migration to revision <info>' . $revision->getId() . '</info> ' . $revision->getName() . ' ...');
