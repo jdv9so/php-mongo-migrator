@@ -99,7 +99,11 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      */
     public function getProjectRoot()
     {
-        return getcwd();
+        $baseDir = getenv('BASE_DIR');
+        if (empty($baseDir)) {
+            return getcwd();
+        }
+        return $baseDir;
     }
     
     /**
